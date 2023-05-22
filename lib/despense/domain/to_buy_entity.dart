@@ -10,4 +10,13 @@ class ToBuyItem {
   final String name;
   final String description;
   final bool isBought;
+
+  Map<String, dynamic> toMap(){
+    return {
+      'id' : id,
+      'name' : name,
+      'description' : description,
+      'isbought' : isBought,
+    };
+  }
 }
