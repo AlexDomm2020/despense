@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mydespenseapp/despense/domain/despense_entity.dart';
 import 'package:mydespenseapp/despense/presentation/widgets/alert_dialog_widget.dart';
+import 'package:mydespenseapp/despense/presentation/widgets/despense_card.dart';
 import 'package:mydespenseapp/providers/sqlite_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,8 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ? ListView.builder(
               itemCount: _items.length,
               itemBuilder: (context, index) {
-                return Text(
-                  _items[index].name!,
+                return DespenseCard(
+                  expansionPanelTitle: _items[index].name,
                 );
               })
           : const SizedBox.shrink(),
