@@ -17,11 +17,12 @@ class DespenseDatabase {
   Future<void> createDatabase() async {
     openDatabase(
       join(await getDatabasesPath(), 'despense_items.db'),
-      onCreate: (db, version) {
-        db.execute(
+      onCreate: (db, version) async {
+        await db.execute(
             'CREATE TABLE despenseitems(id INTEGER PRIMARY KEY autoincrement, name TEXT)');
-        db.execute(
-            'CREATE TABLE tobuyitems(id INTEGER PRIMARY KEY autoincrement, name TEXT, description TEXT, isbought BOOLEAN, despenseitemid INTEGER REFERENCES despenseitems(id))');
+        await db.execute(
+            'CREATE TABLE tobuyitems(id INTEGER PRIMARY KEY autoincrement, name TEXT, isbought BOOLEAN, despenseitemid REFERENCES despenseitems(id))');
+        await db.execute('PRAGMA foreign_keys = ON');
       },
       onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
       version: 1,
@@ -62,16 +63,30 @@ class DespenseDatabase {
 
   Future<List<ToBuyItem>> getToBuyItems(int despenseItemId) async {
     final db = await database();
+
     final List<Map<String, dynamic>> toBuyItems = await db.query(
-        'SELECT * FROM tobuyitems WHERE despenseitemid = $despenseItemId');
+      'tobuyitems',
+      where: 'despenseitemid = $despenseItemId',
+    );
+
     return List.generate(
       toBuyItems.length,
       (index) => ToBuyItem(
         toBuyItems[index]['id'],
+        null,
         toBuyItems[index]['name'],
-        toBuyItems[index]['description'],
-        toBuyItems[index]['isbought'],
+        toBuyItems[index]['isbought'] == 'false' ? false : true,
       ),
+    );
+  }
+
+  Future updateToBuyItems(int toBuyItemId, bool isBought) async {
+    final db = await database();
+
+    await db.update(
+      'tobuyitems',
+      {'isbought': isBought.toString()},
+      where: 'id = $toBuyItemId',
     );
   }
 }

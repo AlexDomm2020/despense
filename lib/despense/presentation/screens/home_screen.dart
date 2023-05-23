@@ -12,7 +12,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<DespenseItem> _items = [];
+  late List<DespenseItem> _items;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    _items = [];
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getItems();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +31,22 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("DespenseApp"),
         centerTitle: true,
       ),
-      body: _items.isNotEmpty
+      body: !isLoading
           ? ListView.builder(
               itemCount: _items.length,
               itemBuilder: (context, index) {
-                return DespenseCard(
-                  expansionPanelTitle: _items[index].name,
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  child: DespenseCard(
+                    expansionPanelTitle: _items[index].name,
+                    itemId: _items[index].id!,
+                  ),
                 );
               })
-          : const SizedBox.shrink(),
+          : const Align(
+              alignment: Alignment.center,
+              child: CircularProgressIndicator(),
+            ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
@@ -44,5 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
     );
+  }
+
+  Future getItems() async {
+    _items.addAll(await DespenseDatabase.instance.getDespenseItems());
+    isLoading = false;
+    setState(() {});
   }
 }

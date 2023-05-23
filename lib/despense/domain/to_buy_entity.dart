@@ -1,22 +1,22 @@
 class ToBuyItem {
   ToBuyItem(
     this.id,
+    this.despenseitemid,
     this.name,
-    this.description,
     this.isBought,
   );
 
-  final int id;
+  final int? id;
+  final int? despenseitemid;
   final String name;
-  final String description;
-  final bool isBought;
+  bool isBought;
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
-      'id' : id,
-      'name' : name,
-      'description' : description,
-      'isbought' : isBought,
+      'id': id,
+      'despenseitemid': despenseitemid,
+      'name': name,
+      'isbought': isBought.toString(),
     };
   }
 }
